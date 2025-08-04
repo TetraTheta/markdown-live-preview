@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+vars:
+  BIN_NAME: mdlp
+  GCFLAGS: all="-B -l"
+  LDFLAGS: -s -w -extldflags "-static"
+  LDFLAGS_GUI: -s -w -H windowsgui -extldflags "-static"
+
+tasks:
+  default:
+    cmds:
+      - task: format
+      - task: build:win
+  build:win:
+    dir: src
+    env:
+      GOARCH: amd64
+      GOOS: windows
+      PATH: "E:\\WinLibs\\bin;{{ env \"PATH\" }}"
+      WEBVIEW_USE_BUILTIN_MSWEBVIEW2: 1
+    cmds:
+      - task: manifest:win
+      - go build -o ../{{.BIN_NAME}}.exe -trimpath -ldflags='{{.LDFLAGS_GUI}}' -gcflags={{.GCFLAGS}}
+  dev:win:
+    dir: src
+    env:
+      GOARCH: amd64
+      GOOS: windows
+      PATH: "E:\\WinLibs\\bin;{{ env \"PATH\" }}"
+      WEBVIEW_USE_BUILTIN_MSWEBVIEW2: 1
+    cmds:
+      - task: manifest:win
+      - go build -o ../{{.BIN_NAME}}.exe -trimpath -ldflags='{{.LDFLAGS}}' -gcflags={{.GCFLAGS}}
+  manifest:win:
+    vars:
+      GOARCH: amd64
+      GOOS: windows
+    cmds:
+      # This doesn't use 'winres.json' because it won't work anyway.
+      - go-winres simply --icon winres/icon.png --manifest gui
+      - coreutils mv rsrc_{{.GOOS}}_{{.GOARCH}}.syso src
+      - coreutils rm rsrc_*.syso
+  format:
+    dir: src
+    cmds:
+      - gofmt -s -w .

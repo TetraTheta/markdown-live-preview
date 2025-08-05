@@ -12,7 +12,6 @@ import (
 	"github.com/yuin/goldmark/util"
 	html2 "html"
 	"path"
-	"path/filepath"
 	"regexp"
 )
 
@@ -103,7 +102,7 @@ func (r *RendererHSImg) renderHSImg(w util.BufWriter, source []byte, node ast.No
 	n := node.(*HSImg)
 
 	esc := html2.EscapeString(n.Src)
-	_, _ = w.WriteString(fmt.Sprintf(`<img src="%s" class="img-fluid" title="%s" />`, esc, filepath.Base(esc)))
+	_, _ = w.WriteString(fmt.Sprintf(`<img src="%s" class="img-fluid" title="%s" />`, esc, esc))
 	return ast.WalkContinue, nil
 }
 
@@ -116,7 +115,7 @@ func PostProcessHSImg(input bytes.Buffer) string {
 			return match
 		}
 		src := html2.EscapeString(string(groups[1]))
-		return []byte(fmt.Sprintf(`<img src="%s" class="img-fluid" title="%s" />`, src, filepath.Base(src)))
+		return []byte(fmt.Sprintf(`<img src="%s" class="img-fluid" title="%s" />`, src, html2.EscapeString(src)))
 	})
 	return string(replaced)
 }

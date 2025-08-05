@@ -10,7 +10,6 @@ vars:
 tasks:
   default:
     cmds:
-      - task: format
       - task: build:win
   build:win:
     dir: src
@@ -20,8 +19,9 @@ tasks:
       PATH: "E:\\WinLibs\\bin;{{ env \"PATH\" }}"
       WEBVIEW_USE_BUILTIN_MSWEBVIEW2: 1
     cmds:
+      - task: format
       - task: manifest:win
-      - go build -o ../{{.BIN_NAME}}.exe -trimpath -ldflags='{{.LDFLAGS_GUI}}' -gcflags={{.GCFLAGS}}
+      - go build -o ../{{.BIN_NAME}}.exe -trimpath -ldflags='{{.LDFLAGS_GUI}}' -gcflags={{.GCFLAGS}} -v
   dev:win:
     dir: src
     env:
@@ -30,8 +30,9 @@ tasks:
       PATH: "E:\\WinLibs\\bin;{{ env \"PATH\" }}"
       WEBVIEW_USE_BUILTIN_MSWEBVIEW2: 1
     cmds:
+      - task: format
       - task: manifest:win
-      - go build -o ../{{.BIN_NAME}}.exe -trimpath -ldflags='{{.LDFLAGS}}' -gcflags={{.GCFLAGS}}
+      - go build -o ../{{.BIN_NAME}}.exe -trimpath -ldflags='{{.LDFLAGS}}' -gcflags={{.GCFLAGS}} -v
   manifest:win:
     vars:
       GOARCH: amd64

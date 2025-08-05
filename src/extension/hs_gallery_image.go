@@ -145,7 +145,7 @@ func (r *RendererHSGalleryImage) renderHSGalleryImage(w util.BufWriter, source [
 
 	for _, src := range n.Src {
 		esc := html2.EscapeString(strings.TrimSpace(src))
-		_, _ = w.WriteString(fmt.Sprintf(`<div class="gallery-inner" style="width:%s"><img src="%s" class="img-fluid" /></div>`, pct, esc))
+		_, _ = w.WriteString(fmt.Sprintf(`<div class="gallery-inner" style="width:%s"><img src="%s" class="img-fluid" title="%s" /></div>`, pct, esc, html2.EscapeString(src)))
 	}
 	_, _ = w.WriteString(`</div>`)
 

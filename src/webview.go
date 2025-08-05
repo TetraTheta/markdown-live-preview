@@ -15,9 +15,10 @@ import (
 )
 
 var (
-	currentRotation int
-	currentWebView  webview.WebView
-	lock            sync.Mutex
+	rotIdx    int
+	cWB       webview.WebView
+	scrollPos int64
+	lock      sync.Mutex
 )
 
 func hashedFilePath(path string) string {
@@ -40,18 +41,33 @@ func LaunchViewer(path string) {
 		log.Fatalf("Failed to render markdown: %v", err)
 	}
 
-	rotationPath, err := writeRotatingHTML(path, []byte(html), 0)
+	rotPath, err := writeRotatingHTML(path, []byte(html), 0)
 	if err != nil {
 		log.Fatalf("Failed to write HTML: %v", err)
 	}
 
 	w := webview.New(true)
-	currentWebView = w
+	cWB = w
 	defer w.Destroy()
+
+	_ = w.Bind("LoadScroll", func() (int64, error) {
+		lock.Lock()
+		y := scrollPos
+		lock.Unlock()
+		return y, nil
+	})
+
+	_ = w.Bind("SaveScroll", func(y int64) error {
+		lock.Lock()
+		scrollPos = y
+		lock.Unlock()
+		return nil
+	})
 
 	w.SetTitle("Markdown Live Preview")
 	w.SetSize(800, 600, webview.HintNone)
-	w.Navigate("file://" + rotationPath)
+	w.SetSize(800, 600, webview.HintMin)
+	w.Navigate("file://" + rotPath)
 
 	setAppIcon(w)
 
@@ -74,7 +90,7 @@ func watchAndReload(path string) {
 		log.Fatal(err)
 	}
 
-	debounce := time.Now()
+	curTime := time.Now()
 
 	for {
 		select {
@@ -83,10 +99,11 @@ func watchAndReload(path string) {
 				return
 			}
 			if event.Op&fsnotify.Write == fsnotify.Write {
-				if time.Since(debounce) < 200*time.Millisecond {
+				// Skip Write Event happen in 200ms window
+				if time.Since(curTime) < 200*time.Millisecond {
 					continue
 				}
-				debounce = time.Now()
+				curTime = time.Now()
 
 				html, err := RenderMarkdown(path)
 				if err != nil {
@@ -94,16 +111,19 @@ func watchAndReload(path string) {
 					continue
 				}
 				lock.Lock()
-				currentRotation = (currentRotation + 1) % 2
-				outPath, err := writeRotatingHTML(path, []byte(html), currentRotation)
-				if err == nil {
-					currentWebView.Dispatch(func() {
-						currentWebView.Eval("scrollY = window.scrollY")
-						currentWebView.Navigate("file://" + outPath)
-						currentWebView.Eval("window.scrollTo(0, scrollY")
-					})
-				}
+				rotIdx = (rotIdx + 1) % 2
+				outPath, err := writeRotatingHTML(path, []byte(html), rotIdx)
 				lock.Unlock()
+
+				if err != nil {
+					log.Println("Failled to write HTML:", err)
+				}
+
+				// Dispatch is needed because this is a go routine, not a main thread
+				cWB.Dispatch(func() {
+					// Save scroll position + Open
+					cWB.Eval(fmt.Sprintf("(async function(){await SaveScroll(window.scrollY);window.location.href=%q})()", "file://"+outPath))
+				})
 			}
 		case err, ok := <-watcher.Errors:
 			if !ok {

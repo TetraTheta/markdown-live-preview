@@ -8,9 +8,11 @@ body {
   tab-size: 2;
 }
 
+b, strong { font-weight: 700; }
+
 blockquote {
   border-left: 4px solid #0D6EFD;
-  margin: .7rem 0 .7rem 0;
+  margin: 0.7rem 0 0.7rem 0;
   padding: 0.25rem 0 0.25rem 1rem;
 }
 blockquote.bq {
@@ -21,8 +23,10 @@ blockquote.bq {
   padding: 0.5rem 1rem;
 }
 blockquote hr { margin: 0.5rem 0; }
-blockquote> :first-child { margin-top: 0; }
-blockquote> :last-child { margin-bottom: 0; }
+blockquote > :first-child { margin-top: 0; }
+blockquote > :last-child { margin-bottom: 0; }
+
+code, pre { font-family: 'Monoplex KR Wide Nerd', D2Coding, 'D2 coding', Consolas, monospace; }
 
 del { color: grey; }
 
@@ -30,7 +34,7 @@ h1, h2, h3, h4, h5, h6 { margin-top: 2rem; }
 
 hr { margin: 1.5rem 0; }
 
-img { -webkit-user-drag: none; user-select: none; }
+img { -webkit-user-drag: none; margin: 0; user-select: none; }
 
 input[type=checkbox] {
   margin-right: 0.4rem;
@@ -44,18 +48,20 @@ p { margin: 0 0 1rem 0; }
 p:not(:first-child) { margin: 0.7rem 0; }
 p:last-child { margin-bottom: 0; }
 
+pre { background-color: #343A40; padding: 1rem; }
+
 ol, ul { margin-bottom: 0.7rem; margin-top: 0.7rem; padding-left: 2rem; }
 ol li, ul li { margin-bottom: 0; }
 ol:first-child, ul:first-child { margin-top: 0; }
 ol:last-child, ul:last-child { margin-bottom: 0; }
 
-ruby>rt { font-size: 75%; }
+ruby > rt { font-size: 75%; }
 
 table { margin-bottom: 0.5rem; }
 
 /* Gallery */
 div.gallery-container {
-  align-items: baseline;
+  align-items: center;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;

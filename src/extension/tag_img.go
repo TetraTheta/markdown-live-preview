@@ -9,7 +9,7 @@ import (
 	"github.com/yuin/goldmark/renderer/html"
 	"github.com/yuin/goldmark/text"
 	"github.com/yuin/goldmark/util"
-	"path/filepath"
+	html2 "html"
 	"regexp"
 	"strings"
 )
@@ -23,20 +23,10 @@ func (t *TransformerImage) Transform(doc *ast.Document, reader text.Reader, pc p
 		if entering {
 			if img, ok := n.(*ast.Image); ok {
 				var origClass string
-				var origTitle string
-				var origSrc string
 				for _, attr := range img.Attributes() {
 					if string(attr.Name) == "class" {
 						if v, ok := attr.Value.([]byte); ok {
 							origClass = string(v)
-						}
-					} else if string(attr.Name) == "title" {
-						if v, ok := attr.Value.([]byte); ok {
-							origTitle = string(v)
-						}
-					} else if string(attr.Name) == "src" {
-						if v, ok := attr.Value.([]byte); ok {
-							origSrc = string(v)
 						}
 					}
 				}
@@ -44,8 +34,18 @@ func (t *TransformerImage) Transform(doc *ast.Document, reader text.Reader, pc p
 					newClass := strings.TrimSpace(origClass + " img-fluid")
 					img.SetAttributeString("class", []byte(newClass))
 				}
+
+				origTitle := ""
+				for _, attr := range img.Attributes() {
+					if string(attr.Name) == "title" {
+						if v, ok := attr.Value.([]byte); ok {
+							origTitle = string(v)
+						}
+					}
+				}
 				if origTitle == "" {
-					img.SetAttributeString("title", filepath.Base(origSrc))
+					src := string(img.Destination)
+					img.SetAttributeString("title", []byte(html2.EscapeString(src)))
 				}
 			}
 		}

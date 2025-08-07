@@ -65,6 +65,17 @@ func (p *ParserHSGalleryImage) Open(parent ast.Node, reader text.Reader, pc pars
 		attrs[sm[1]] = sm[2]
 	}
 
+	if _, hasWidth := attrs["width"]; !hasWidth {
+		if v, ok := attrs["w"]; ok {
+			attrs["width"] = v
+		}
+	}
+	if _, hasCaption := attrs["caption"]; !hasCaption {
+		if v, ok := attrs["c"]; ok {
+			attrs["caption"] = v
+		}
+	}
+
 	srcRaw, ok := attrs["src"]
 	if !ok || strings.TrimSpace(srcRaw) == "" {
 		return nil, parser.NoChildren

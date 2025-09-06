@@ -21,6 +21,7 @@ import (
 type HSGalleryImage struct {
 	ast.BaseBlock
 	Src     []string
+	Align   string
 	Width   string
 	Caption string
 }
@@ -34,6 +35,7 @@ func (g *HSGalleryImage) Kind() ast.NodeKind {
 func (g *HSGalleryImage) Dump(source []byte, level int) {
 	ast.DumpHelper(g, source, level, map[string]string{
 		"Src":     fmt.Sprintf("%v", g.Src),
+		"Align":   g.Align,
 		"Width":   g.Width,
 		"Caption": g.Caption,
 	}, nil)
@@ -45,7 +47,7 @@ type ParserHSGalleryImage struct{}
 
 var (
 	galleryImageSyntaxRE = regexp.MustCompile(`^\{\{<\s*gallery/image\s+([^>]+?)\s*>}}\s*$`)
-	galleryImageAttrRE   = regexp.MustCompile(`(\w+)\s*=\s*"([^"]*)"`)
+	galleryImageAttrRE   = regexp.MustCompile(`(\w+)\s*=\s*(?:"([^"]*)"|([^"\s]+))`)
 )
 
 func (p *ParserHSGalleryImage) Trigger() []byte {
@@ -62,17 +64,29 @@ func (p *ParserHSGalleryImage) Open(parent ast.Node, reader text.Reader, pc pars
 	attrsRaw := string(m[1])
 	attrs := make(map[string]string)
 	for _, sm := range galleryImageAttrRE.FindAllStringSubmatch(attrsRaw, -1) {
-		attrs[sm[1]] = sm[2]
+		key := sm[1]
+		var val string
+		if sm[2] != "" {
+			val = sm[2]
+		} else {
+			val = sm[3]
+		}
+		attrs[key] = val
 	}
 
-	if _, hasWidth := attrs["width"]; !hasWidth {
-		if v, ok := attrs["w"]; ok {
-			attrs["width"] = v
+	if _, hasAlign := attrs["align"]; !hasAlign {
+		if v, ok := attrs["a"]; ok {
+			attrs["align"] = v
 		}
 	}
 	if _, hasCaption := attrs["caption"]; !hasCaption {
 		if v, ok := attrs["c"]; ok {
 			attrs["caption"] = v
+		}
+	}
+	if _, hasWidth := attrs["width"]; !hasWidth {
+		if v, ok := attrs["w"]; ok {
+			attrs["width"] = v
 		}
 	}
 
@@ -96,6 +110,7 @@ func (p *ParserHSGalleryImage) Open(parent ast.Node, reader text.Reader, pc pars
 
 	node := &HSGalleryImage{
 		Src:     srcItems,
+		Align:   attrs["align"],
 		Width:   attrs["width"],
 		Caption: attrs["caption"],
 	}

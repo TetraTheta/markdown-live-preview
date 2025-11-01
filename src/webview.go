@@ -66,7 +66,7 @@ func LaunchViewer(path string) {
 
 	w.SetTitle("Markdown Live Preview")
 	w.SetSize(800, 600, webview.HintNone)
-	w.SetSize(800, 600, webview.HintMin)
+	w.SetSize(200, 200, webview.HintMin)
 	w.Navigate("file://" + rotPath)
 
 	setAppIcon(w)

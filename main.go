@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"markdown-live-preview/webview"
 	"os"
 	"path/filepath"
 	"strings"
@@ -43,5 +44,5 @@ func main() {
 		log.Fatalf("'%s' is not a markdown file.", absPath)
 	}
 
-	LaunchViewer(absPath)
+	webview.LaunchViewer(absPath)
 }

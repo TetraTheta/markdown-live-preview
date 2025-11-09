@@ -1,22 +1,25 @@
-package main
+package webview
 
 import (
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
-	"github.com/fsnotify/fsnotify"
 	"log"
+	"markdown-live-preview/markdown"
+	"markdown-live-preview/resource"
 	"os"
 	"path/filepath"
 	"sync"
 	"time"
 
-	"github.com/webview/webview_go"
+	"github.com/fsnotify/fsnotify"
+
+	webviewgo "github.com/webview/webview_go"
 )
 
 var (
 	rotIdx    int
-	cWB       webview.WebView
+	cWB       webviewgo.WebView
 	scrollPos int64
 	lock      sync.Mutex
 )
@@ -36,7 +39,7 @@ func writeRotatingHTML(path string, content []byte, rotation int) (string, error
 }
 
 func LaunchViewer(path string) {
-	html, err := RenderMarkdown(path)
+	html, err := markdown.RenderMarkdown(path)
 	if err != nil {
 		log.Fatalf("Failed to render markdown: %v", err)
 	}
@@ -46,7 +49,7 @@ func LaunchViewer(path string) {
 		log.Fatalf("Failed to write HTML: %v", err)
 	}
 
-	w := webview.New(true)
+	w := webviewgo.New(true)
 	cWB = w
 	defer w.Destroy()
 
@@ -65,11 +68,11 @@ func LaunchViewer(path string) {
 	})
 
 	w.SetTitle("Markdown Live Preview")
-	w.SetSize(800, 600, webview.HintNone)
-	w.SetSize(200, 200, webview.HintMin)
+	w.SetSize(800, 600, webviewgo.HintNone)
+	w.SetSize(200, 200, webviewgo.HintMin)
 	w.Navigate("file://" + rotPath)
 
-	setAppIcon(w)
+	resource.SetAppIcon(w)
 
 	go watchAndReload(path)
 
@@ -105,7 +108,7 @@ func watchAndReload(path string) {
 				}
 				curTime = time.Now()
 
-				html, err := RenderMarkdown(path)
+				html, err := markdown.RenderMarkdown(path)
 				if err != nil {
 					log.Println("Failed to re-render markdown:", err)
 					continue

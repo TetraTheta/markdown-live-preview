@@ -1,8 +1,13 @@
-package main
+package markdown
 
 import (
 	"bytes"
 	"fmt"
+	ext "markdown-live-preview/extension"
+	"markdown-live-preview/resource"
+	"os"
+	"path/filepath"
+
 	"github.com/gohugoio/hugo-goldmark-extensions/extras"
 	attributes "github.com/mdigger/goldmark-attributes"
 	"github.com/yuin/goldmark"
@@ -10,9 +15,6 @@ import (
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
 	"go.abhg.dev/goldmark/frontmatter"
-	ext "markdown-live-preview/extension"
-	"os"
-	"path/filepath"
 )
 
 const TEMPLATE = `<!DOCTYPE html>
@@ -63,7 +65,7 @@ var md = goldmark.New(
 
 func fillTemplate(path string, content string) string {
 	dir := filepath.ToSlash(filepath.Dir(path)) + "/"
-	return fmt.Sprintf(TEMPLATE, dir, fileDarkCSS, fileGLightboxCSS, fileStyleCSS, content, fileGLightboxJS, fileScriptJS)
+	return fmt.Sprintf(TEMPLATE, dir, resource.FileDarkCSS, resource.FileGLightboxCSS, resource.FileStyleCSS, content, resource.FileGLightboxJS, resource.FileScriptJS)
 }
 
 func RenderMarkdown(path string) (string, error) {

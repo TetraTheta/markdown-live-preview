@@ -3,6 +3,11 @@ package extension
 import (
 	"bytes"
 	"fmt"
+	html2 "html"
+	"path"
+	"regexp"
+	"strings"
+
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/parser"
@@ -10,10 +15,6 @@ import (
 	"github.com/yuin/goldmark/renderer/html"
 	"github.com/yuin/goldmark/text"
 	"github.com/yuin/goldmark/util"
-	html2 "html"
-	"path"
-	"regexp"
-	"strings"
 )
 
 // -------- AST node --------

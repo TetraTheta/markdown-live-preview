@@ -1,6 +1,6 @@
 //go:build windows
 
-package main
+package resource
 
 /*
 #include <windows.h>
@@ -14,11 +14,12 @@ void set_resource_icon(const void *ptr, char* name) {
 */
 import "C"
 import (
-	webview "github.com/webview/webview_go"
 	"unsafe"
+
+	webview "github.com/webview/webview_go"
 )
 
-func setAppIcon(w webview.WebView) {
+func SetAppIcon(w webview.WebView) {
 	hwnd := w.Window()
 	cstr := C.CString("#1")
 	defer C.free(unsafe.Pointer(cstr))

@@ -2,6 +2,10 @@ package extension
 
 import (
 	"fmt"
+	html2 "html"
+	"regexp"
+	"strings"
+
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/parser"
@@ -9,16 +13,13 @@ import (
 	"github.com/yuin/goldmark/renderer/html"
 	"github.com/yuin/goldmark/text"
 	"github.com/yuin/goldmark/util"
-	html2 "html"
-	"regexp"
-	"strings"
 )
 
 // -------- AST Transformer --------
 
 type TransformerImage struct{}
 
-func (t *TransformerImage) Transform(doc *ast.Document, reader text.Reader, pc parser.Context) {
+func (t *TransformerImage) Transform(doc *ast.Document, _ text.Reader, _ parser.Context) {
 	_ = ast.Walk(doc, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
 		if entering {
 			if img, ok := n.(*ast.Image); ok {

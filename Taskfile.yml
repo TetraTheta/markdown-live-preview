@@ -12,7 +12,7 @@ tasks:
     cmds:
       - task: build:win
   build:win:
-    dir: src
+    #dir: src
     env:
       GOARCH: amd64
       GOOS: windows
@@ -21,9 +21,13 @@ tasks:
     cmds:
       - task: format
       - task: manifest:win
-      - go build -o ../{{.BIN_NAME}}.exe -trimpath -ldflags='{{.LDFLAGS_GUI}}' -gcflags={{.GCFLAGS}} -v
+      - go build -o {{.BIN_NAME}}.exe -trimpath -ldflags='{{.LDFLAGS_GUI}}' -gcflags={{.GCFLAGS}} -v
+      - task: cleanup
+  cleanup:
+    cmds:
+      - coreutils rm rsrc_*.syso
   dev:win:
-    dir: src
+    #dir: src
     env:
       GOARCH: amd64
       GOOS: windows
@@ -32,17 +36,17 @@ tasks:
     cmds:
       - task: format
       - task: manifest:win
-      - go build -o ../{{.BIN_NAME}}.exe -trimpath -ldflags='{{.LDFLAGS}}' -gcflags={{.GCFLAGS}} -v
+      - go build -o {{.BIN_NAME}}.exe -trimpath -ldflags='{{.LDFLAGS}}' -gcflags={{.GCFLAGS}} -v
+      - task: cleanup
   manifest:win:
     vars:
       GOARCH: amd64
       GOOS: windows
     cmds:
       # This doesn't use 'winres.json' because it won't work anyway.
-      - go-winres simply --icon winres/icon.png --manifest gui
-      - coreutils mv rsrc_{{.GOOS}}_{{.GOARCH}}.syso src
-      - coreutils rm rsrc_*.syso
+      - go install github.com/tc-hib/go-winres@latest
+      - go-winres simply --icon resource/windows/icon.png --manifest gui --product-name "Markdown Live Preview"
   format:
-    dir: src
+    #dir: src
     cmds:
       - gofmt -s -w .

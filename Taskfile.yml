@@ -25,7 +25,8 @@ tasks:
       - task: cleanup
   cleanup:
     cmds:
-      - coreutils rm rsrc_*.syso
+      #- coreutils rm rsrc_*.syso
+      - rm rsrc_*.syso
   dev:win:
     #dir: src
     env:
